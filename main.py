@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from sqlmodel import SQLModel, Session, create_engine, select
 from models import User, UserIn
-from auth import hash_password, verify_password
+from auth import encrypt_password, verify_password
 
 app = FastAPI()
 
@@ -25,11 +25,14 @@ def register(user: UserIn):
         ).first()
 
         if existing_user:
-            raise HTTPException(status_code=400, detail="El usuario ya existe")
+            raise HTTPException(
+                status_code=400,
+                detail="El usuario ya existe"
+            )
 
         new_user = User(
             username=user.username,
-            hashed_password=hash_password(user.password)
+            encrypted_password=encrypt_password(user.password)
         )
 
         session.add(new_user)
@@ -49,7 +52,10 @@ def login(user: UserIn):
         if not db_user:
             return {"message": "Login fallido"}
 
-        if verify_password(user.password, db_user.hashed_password):
+        if verify_password(
+            user.password,
+            db_user.encrypted_password
+        ):
             return {"message": "Login exitoso"}
 
         return {"message": "Login fallido"}

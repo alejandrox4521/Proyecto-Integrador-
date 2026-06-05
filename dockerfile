@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-ENV PEPPER="pepper_de_prueba"
+ENV AES_KEY="12345678901234567890123456789012"
 
 WORKDIR /app
 
